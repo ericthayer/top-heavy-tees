@@ -77,3 +77,18 @@ npm run build
   HTML shell. Node 22 (`.nvmrc`).
 - **CI** (`.github/workflows/ci.yml`): `npm ci`, production dependency audit,
   tests and build on every pull request.
+
+## Versioning and releases
+
+Versions follow [Semantic Versioning](https://semver.org) and are derived from
+[Conventional Commits](https://www.conventionalcommits.org) by
+[release-please](https://github.com/googleapis/release-please).
+
+- **Squash-merge PRs.** The PR title becomes the commit on `main`, and the
+  `PR title` check rejects titles that aren't conventional.
+- **What bumps what:** `fix:` and `perf:` → patch, `feat:` → minor, a `!`
+  after the type (`feat!:`) or a `BREAKING CHANGE:` footer → major. `docs`,
+  `refactor`, `test`, `build`, `ci`, `chore` and `style` don't release.
+- **Releasing:** every push to `main` updates an open "chore(main): release
+  x.y.z" PR with the version bump and `CHANGELOG.md`. Merge it to tag `vX.Y.Z`
+  and publish the GitHub release.
