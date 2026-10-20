@@ -59,3 +59,21 @@ npm run build
 - localStorage: cart, design session (with a smaller copy of each image if the
   original is large), units sold by the mock checkout (subtracted from stock),
   and recent orders.
+
+## Shipping
+
+- **Code splitting**: Home ships in the entry chunk; every other route is
+  `React.lazy` (`src/lib/lazyRoute.js`) and warmed in the background once the
+  browser is idle (skipped on Save-Data or 2G). React and the router live in a
+  separate `vendor` chunk so app deploys don't bust their cache.
+- **Stale deploys**: if an open tab requests a chunk that a newer deploy
+  removed, the app reloads once; a second failure within 30 s shows the error
+  boundary instead of looping.
+- **Saved data**: cart, inventory, orders and the design session are
+  shape-checked when read from localStorage, so data from an older build can't
+  crash the app.
+- **Netlify** (`netlify.toml`): SPA fallback, a strict Content Security Policy
+  and security headers, immutable caching for `/assets/*`, no caching for the
+  HTML shell. Node 22 (`.nvmrc`).
+- **CI** (`.github/workflows/ci.yml`): `npm ci`, production dependency audit,
+  tests and build on every pull request.

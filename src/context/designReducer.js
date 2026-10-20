@@ -65,10 +65,17 @@ export function toStored(state, { withImages = true } = {}) {
 
 export function fromStored(stored) {
   if (!stored || typeof stored !== 'object') return initialDesign;
-  const revive = (d) => (d?.storageSrc ? { ...d, src: d.storageSrc, previous: null } : null);
+  // Saved sessions can outlive a catalog change; drop anything that no longer resolves.
+  const product = getProduct(stored.productId);
+  if (!product) return initialDesign;
+  const revive = (d) =>
+    typeof d?.storageSrc === 'string' && d.storageSrc.startsWith('data:') ? { ...d, src: d.storageSrc, previous: null } : null;
   return {
     ...initialDesign,
     ...stored,
+    colorId: product.colors.includes(stored.colorId) ? stored.colorId : product.colors[0],
+    side: stored.side === 'back' ? 'back' : 'front',
+    qty: Number.isInteger(stored.qty) && stored.qty > 0 ? stored.qty : initialDesign.qty,
     designs: { front: revive(stored.designs?.front), back: revive(stored.designs?.back) },
   };
 }

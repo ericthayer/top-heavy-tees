@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ShirtImage from '../components/ShirtImage.jsx';
 import ProductCard from '../components/ProductCard.jsx';
-import { SuggestionCard } from '../components/studio/SuggestionsPanel.jsx';
+import { SuggestionCard } from '../components/studio/SuggestionCard.jsx';
 import { COLORS, PRODUCTS } from '../data/products.js';
 import { getPrintArea } from '../lib/shirtSvg.js';
 import { SUNRISE_DATA_URL } from '../lib/samples.js';

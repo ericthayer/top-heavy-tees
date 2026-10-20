@@ -1,35 +1,10 @@
 import { useEffect, useState } from 'react';
-import { AlertIcon, CheckIcon, ErrorIcon, InfoIcon, SparkIcon } from '../Icons.jsx';
+import { CheckIcon, SparkIcon } from '../Icons.jsx';
+import { SuggestionCard } from './SuggestionCard.jsx';
 import { contrastProfile } from '../../lib/suggestions.js';
 import { inches } from '../../lib/format.js';
 
-const ICONS = { error: ErrorIcon, warning: AlertIcon, tip: InfoIcon, good: CheckIcon };
-const SEVERITY_LABEL = { error: 'Problem', warning: 'Check', tip: 'Tip', good: 'Good' };
 const STEPS = ['Checking resolution', 'Measuring contrast against the shirt', 'Reviewing placement'];
-
-export function SuggestionCard({ s, onAction, disabled }) {
-  const Icon = ICONS[s.severity];
-  return (
-    <li className={`suggestion suggestion--${s.severity}`}>
-      <span className="suggestion__icon">
-        <Icon size={18} />
-        <span className="visually-hidden">{SEVERITY_LABEL[s.severity]}:</span>
-      </span>
-      <div className="suggestion__body">
-        <p className="suggestion__title">{s.title}</p>
-        <p className="suggestion__detail">{s.detail}</p>
-        {s.action &&
-          (onAction ? (
-            <button type="button" className="suggestion__action" onClick={() => onAction(s.action)} disabled={disabled}>
-              {s.action.label}
-            </button>
-          ) : (
-            <span className="suggestion__action is-static">{s.action.label}</span>
-          ))}
-      </div>
-    </li>
-  );
-}
 
 function contrastLabel(ratio) {
   if (ratio >= 4.5) return 'Strong';

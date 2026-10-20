@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { useInventory } from '../context/InventoryContext.jsx';
 import { cartTotals, qtyInCart } from '../context/cartReducer.js';
 import { money } from '../lib/format.js';
-import { KEYS, readJSON, writeJSON } from '../lib/storage.js';
+import { isStoredOrders, KEYS, readJSON, writeJSON } from '../lib/storage.js';
 import { LineThumb, lineDetails } from './Cart.jsx';
 import { CheckIcon } from '../components/Icons.jsx';
 import NotFound from './NotFound.jsx';
@@ -193,7 +193,7 @@ export default function Checkout() {
   const formRef = useRef(null);
 
   const orderId = params.get('order');
-  const order = useMemo(() => (orderId ? readJSON(KEYS.orders, []).find((o) => o.id === orderId) : null), [orderId]);
+  const order = useMemo(() => (orderId ? readJSON(KEYS.orders, [], isStoredOrders).find((o) => o.id === orderId) : null), [orderId]);
   const totals = cartTotals(items, { shipping: form.shipping });
   const errors = validate(form);
   const shown = (k) => (submitted || touched[k]) && errors[k];
@@ -263,7 +263,7 @@ export default function Checkout() {
       },
       last4: digits(form.card).slice(-4),
     };
-    const orders = readJSON(KEYS.orders, []);
+    const orders = readJSON(KEYS.orders, [], isStoredOrders);
     if (!writeJSON(KEYS.orders, [newOrder, ...orders].slice(0, 10))) {
       // Previews can be large; keep the order without them if storage is full.
       writeJSON(KEYS.orders, [{ ...newOrder, items: items.map((i) => (i.custom ? { ...i, custom: { ...i.custom, preview: null } } : i)) }]);
