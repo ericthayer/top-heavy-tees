@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { getProduct, SIZES } from '../data/products.js';
-import { KEYS, readJSON, writeJSON } from '../lib/storage.js';
+import { isStoredInventory, KEYS, readJSON, writeJSON } from '../lib/storage.js';
 import { useCart } from './CartContext.jsx';
 import { qtyInCart } from './cartReducer.js';
 
@@ -9,7 +9,7 @@ import { qtyInCart } from './cartReducer.js';
 const InventoryContext = createContext(null);
 
 export function InventoryProvider({ children }) {
-  const [sold, setSold] = useState(() => readJSON(KEYS.inventory, {}));
+  const [sold, setSold] = useState(() => readJSON(KEYS.inventory, {}, isStoredInventory));
   const { items } = useCart();
 
   useEffect(() => {

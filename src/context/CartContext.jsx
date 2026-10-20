@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { cartReducer, cartTotals, initialCart } from './cartReducer.js';
-import { KEYS, readJSON, writeJSON } from '../lib/storage.js';
+import { isStoredCart, KEYS, readJSON, writeJSON } from '../lib/storage.js';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [state, dispatch] = useReducer(cartReducer, initialCart, () => readJSON(KEYS.cart, initialCart));
+  const [state, dispatch] = useReducer(cartReducer, initialCart, () => readJSON(KEYS.cart, initialCart, isStoredCart));
 
   useEffect(() => {
     writeJSON(KEYS.cart, state);
