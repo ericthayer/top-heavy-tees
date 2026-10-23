@@ -442,11 +442,12 @@ export async function generateMockups({ style, color, designs, onProgress, signa
 /** Small JPEG thumbnail of the shirt for the cart. */
 export async function makeCartPreview({ style, color, designs }) {
   const side = designs.front ? 'front' : designs.back ? 'back' : 'front';
-  const shirt = await composeShirt({ style, side, color, design: designs[side], px: 400 });
+  // Same studio framing as the catalog shots, so cart thumbnails match.
+  const shirt = await composeShirt({ style, side, color, design: designs[side], px: 700 });
+  const full = renderStudio(shirt);
   const c = makeCanvas(360, 420);
   const ctx = c.getContext('2d');
-  ctx.fillStyle = '#E7E7E7';
-  ctx.fillRect(0, 0, c.width, c.height);
-  ctx.drawImage(shirt, 10, 12, 340, (shirt.height / shirt.width) * 340);
-  return c.toDataURL('image/jpeg', 0.84);
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(full, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.86);
 }

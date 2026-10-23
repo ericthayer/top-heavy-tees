@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ShirtImage from '../components/ShirtImage.jsx';
+import ProductShot from '../components/ProductShot.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import { SuggestionCard } from '../components/studio/SuggestionCard.jsx';
 import { COLORS, PRODUCTS } from '../data/products.js';
 import { getPrintArea } from '../lib/shirtSvg.js';
-import { SUNRISE_DATA_URL } from '../lib/samples.js';
+import { SUNRISE_DATA_URL, SUNRISE_RASTER_URL } from '../lib/samples.js';
 
 const HERO_COLORS = ['white', 'heather', 'royal', 'red', 'forest', 'black'];
 
@@ -40,6 +40,24 @@ const EXAMPLES = [
   },
 ];
 
+// The sample badge, placed the way the studio would place it, for rendered shots.
+const SUNRISE_PLACED = {
+  key: 'sunrise',
+  src: SUNRISE_RASTER_URL,
+  naturalWidth: 1600,
+  naturalHeight: 1600,
+  widthRatio: 0.8,
+  cx: 0.5,
+  cy: 0.06 + (0.8 * 0.75) / 2,
+  rotation: 0,
+};
+
+const ANGLES = [
+  { id: 'studio', label: 'Front' },
+  { id: 'angled', label: 'Angled' },
+  { id: 'flatlay', label: 'Flat lay' },
+];
+
 export default function Home() {
   const [colorId, setColorId] = useState('white');
   const featured = PRODUCTS.filter((p) => p.featured).slice(0, 4);
@@ -47,6 +65,16 @@ export default function Home() {
     const pa = getPrintArea('crew', 'front');
     const w = pa.w * 0.8;
     return { href: SUNRISE_DATA_URL, cx: pa.x + pa.w / 2, cy: pa.y + pa.h * 0.06 + w / 2, w, h: w, rotation: 0 };
+  }, []);
+
+  // Once the page has settled, render the other hero colors so switching is instant.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      import('../lib/productShots.js').then(({ productShot }) =>
+        HERO_COLORS.forEach((id) => productShot({ style: 'crew', color: COLORS[id].hex, width: 960, design: SUNRISE_PLACED })),
+      );
+    }, 1500);
+    return () => clearTimeout(t);
   }, []);
 
   return (
@@ -73,11 +101,12 @@ export default function Home() {
         </div>
         <figure className="hero__stage">
           <div className="hero__shirt">
-            <ShirtImage
+            <ProductShot
               style="crew"
               color={COLORS[colorId].hex}
-              design={heroDesign}
-              loading="eager"
+              width={960}
+              design={SUNRISE_PLACED}
+              fallbackDesign={heroDesign}
               alt={`Everyday Crew in ${COLORS[colorId].name} with a sunrise badge printed on the chest`}
             />
           </div>
@@ -117,6 +146,39 @@ export default function Home() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="section angles" aria-labelledby="angles-heading">
+        <div className="angles__intro">
+          <h2 id="angles-heading" className="section__title">
+            See it from every angle
+          </h2>
+          <p>
+            The studio renders your design onto the exact shirt you picked, with fabric shading and texture, before you pay. Download any view
+            to share it.
+          </p>
+          <Link to="/design-studio" className="btn btn--outline">
+            Open the design studio
+          </Link>
+        </div>
+        <ul className="angles__row">
+          {ANGLES.map((a) => (
+            <li key={a.id}>
+              <figure>
+                <ProductShot
+                  style="crew"
+                  color={COLORS.heather.hex}
+                  view={a.id}
+                  width={720}
+                  design={SUNRISE_PLACED}
+                  fallbackDesign={heroDesign}
+                  alt={`${a.label} mockup of a heather grey crew with the sunrise badge`}
+                />
+                <figcaption>{a.label}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="section" aria-labelledby="featured-heading">

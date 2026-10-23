@@ -2,6 +2,9 @@
 
 export const initialCart = { items: [] };
 
+/** Standard shipping is free from this subtotal. */
+export const FREE_SHIPPING_MIN = 75;
+
 export function lineKey({ productId, colorId, size, custom }) {
   return custom ? `custom:${custom.id}` : `${productId}:${colorId}:${size}`;
 }
@@ -35,7 +38,7 @@ export function cartReducer(state, action) {
 export function cartTotals(items, { shipping = 'standard' } = {}) {
   const subtotal = items.reduce((s, i) => s + i.unitPrice * i.qty, 0);
   const count = items.reduce((s, i) => s + i.qty, 0);
-  const shippingCost = count === 0 ? 0 : shipping === 'express' ? 14.95 : subtotal >= 75 ? 0 : 5.95;
+  const shippingCost = count === 0 ? 0 : shipping === 'express' ? 14.95 : subtotal >= FREE_SHIPPING_MIN ? 0 : 5.95;
   const tax = Math.round(subtotal * 0.08 * 100) / 100;
   return { subtotal, count, shippingCost, tax, total: subtotal + shippingCost + tax };
 }

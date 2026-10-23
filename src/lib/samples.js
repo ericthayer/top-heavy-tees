@@ -65,3 +65,8 @@ export async function sampleFile(id) {
 }
 
 export const SUNRISE_DATA_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(SUNRISE)}`;
+
+/** Same artwork with an explicit pixel size, for drawing onto canvas. */
+export const SUNRISE_RASTER_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  SUNRISE.replace('<svg ', '<svg width="1600" height="1600" '),
+)}`;

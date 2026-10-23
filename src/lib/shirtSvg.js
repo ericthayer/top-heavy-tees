@@ -308,7 +308,8 @@ function trimColorFor(hex) {
 
 function defs(geo, style, side, lum) {
   const dA = 0.07 + 0.07 * lum;
-  const lA = 0.04 + 0.08 * (1 - lum);
+  // Highlights fade out on dark fabric so black shirts don't get a grey haze.
+  const lA = 0.04 + 0.08 * (1 - lum) * Math.min(1, lum * 4 + 0.35);
   const pa = getPrintArea(style, side);
   return {
     dA,

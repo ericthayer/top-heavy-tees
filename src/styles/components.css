@@ -168,6 +168,21 @@
   .menu-toggle {
     display: inline-grid;
   }
+  .site-header__inner {
+    gap: 8px;
+  }
+  .site-header .wordmark {
+    gap: 8px;
+  }
+  .site-header .wordmark__mark {
+    width: 28px;
+  }
+  .site-header .wordmark__text {
+    font-size: 0.9375rem;
+  }
+  .cart-link {
+    padding: 8px;
+  }
   .cart-link__label {
     display: none;
   }
@@ -357,6 +372,42 @@
   -webkit-user-drag: none;
 }
 
+/* Rendered product shot. The background and the fallback drawing are framed
+   to match the render, so the swap from vector to photo is barely visible. */
+.shot {
+  position: relative;
+  aspect-ratio: 6 / 7;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 55% at 45% 30%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(#f4f4f4, #dcdcdc);
+}
+
+.shot__fallback {
+  position: absolute;
+  left: 8.333%;
+  top: 7.143%;
+  width: 83.333%;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.16));
+}
+
+.shot__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: shot-in 0.4s var(--ease) both;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@keyframes shot-in {
+  from {
+    opacity: 0;
+  }
+}
+
 /* Product cards ---------------------------------------------------------------- */
 
 .product-grid {
@@ -399,14 +450,30 @@
 
 .product-card__media {
   position: relative;
-  padding: 8% 10% 4%;
   border-radius: var(--r-lg);
-  background: var(--tint);
-  transition: background-color 0.2s var(--ease);
+  overflow: hidden;
 }
 
-.product-card__link:hover .product-card__media {
-  background: #dedede;
+.product-card__media > .shot:first-child .shot__img,
+.product-card__media > .shot:first-child .shot__fallback {
+  transition: transform 0.5s var(--ease);
+}
+
+/* Hover: the back of the shirt fades in over the front. */
+.product-card__back {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+
+.product-card__link:hover .product-card__back,
+.product-card__link:focus-visible .product-card__back {
+  opacity: 1;
+}
+
+.product-card__link:hover .product-card__media > .shot:first-child .shot__img {
+  transform: scale(1.02);
 }
 
 .product-card__link:hover .product-card__name {
@@ -415,9 +482,9 @@
   text-underline-offset: 0.2em;
 }
 
-.product-card.is-out .shirt-img {
-  opacity: 0.55;
-  filter: grayscale(0.4);
+.product-card.is-out .shot {
+  opacity: 0.6;
+  filter: grayscale(0.5);
 }
 
 .product-card__text {
@@ -957,4 +1024,249 @@
 .suggestions--compact .suggestion__icon {
   width: 24px;
   height: 24px;
+}
+
+/* Announcement bar ------------------------------------------------------------- */
+
+.announce {
+  padding: 8px var(--gutter);
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+  font-size: var(--fs-12);
+  font-weight: 600;
+  font-variation-settings: 'wdth' 112;
+  letter-spacing: 0.02em;
+}
+
+/* Header cart is a button that opens the drawer */
+button.cart-link {
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* Free-shipping meter ------------------------------------------------------------ */
+
+.ship-meter {
+  display: grid;
+  gap: 8px;
+  font-size: var(--fs-14);
+}
+
+.ship-meter__track {
+  height: 4px;
+  background: var(--tint);
+  overflow: hidden;
+}
+
+.ship-meter__track span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.4s var(--ease);
+}
+
+.ship-meter.is-done .ship-meter__track span {
+  background: var(--ok);
+}
+
+.ship-meter.is-done p {
+  color: var(--ok);
+  font-weight: 650;
+}
+
+/* Cart thumbnails that are studio shots */
+.shot.line-thumb {
+  padding: 0;
+}
+
+/* Cart drawer ------------------------------------------------------------------- */
+
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(440px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: -24px 0 48px -24px rgba(0, 0, 0, 0.35);
+}
+
+.drawer::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.drawer[open] {
+  animation: drawer-in 0.32s var(--ease);
+}
+
+.drawer[open]::backdrop {
+  animation: fade-in 0.32s var(--ease);
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.drawer__panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.drawer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.drawer__head h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-21);
+  font-weight: 850;
+  font-variation-settings: 'wdth' 118;
+}
+
+.drawer__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: #fff;
+  font-size: var(--fs-12);
+  font-variation-settings: 'wdth' 100;
+}
+
+.drawer__meter {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.drawer__lines {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 20px;
+}
+
+.drawer-line {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.drawer-line:last-child {
+  border-bottom: 0;
+}
+
+.drawer-line .line-thumb {
+  width: 76px;
+}
+
+.drawer-line__name {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.drawer-line__meta {
+  margin-top: 2px;
+  font-size: var(--fs-14);
+  color: var(--steel);
+}
+
+.drawer-line__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.drawer-line__controls .qty {
+  height: 38px;
+}
+
+.drawer-line__controls .qty__btn {
+  width: 34px;
+}
+
+.drawer-line__controls .qty .qty__input {
+  width: 34px;
+}
+
+.drawer-line__price {
+  font-size: var(--fs-16);
+}
+
+.drawer__foot {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.drawer__subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-18);
+  font-weight: 750;
+}
+
+.drawer__note {
+  margin-top: -4px;
+  font-size: var(--fs-14);
+  color: var(--steel);
+}
+
+.drawer__empty {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 12px;
+  padding: 28px 20px;
+}
+
+.drawer__empty p {
+  font-size: var(--fs-18);
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+
+/* Smallest phones: shrink the wordmark rather than drop part of the name. */
+@media (max-width: 359px) {
+  .site-header .wordmark__mark {
+    width: 24px;
+  }
+  .site-header .wordmark__text {
+    font-size: 0.8125rem;
+  }
 }

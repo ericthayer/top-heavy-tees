@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { cartReducer, cartTotals, initialCart } from './cartReducer.js';
 import { isStoredCart, KEYS, readJSON, writeJSON } from '../lib/storage.js';
 
@@ -6,6 +6,9 @@ const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, initialCart, () => readJSON(KEYS.cart, initialCart, isStoredCart));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const openDrawer = useCallback(() => setDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
   useEffect(() => {
     writeJSON(KEYS.cart, state);
@@ -17,8 +20,8 @@ export function CartProvider({ children }) {
   const clear = useCallback(() => dispatch({ type: 'clear' }), []);
 
   const value = useMemo(
-    () => ({ items: state.items, totals: cartTotals(state.items), add, setQty, remove, clear }),
-    [state.items, add, setQty, remove, clear],
+    () => ({ items: state.items, totals: cartTotals(state.items), add, setQty, remove, clear, drawerOpen, openDrawer, closeDrawer }),
+    [state.items, add, setQty, remove, clear, drawerOpen, openDrawer, closeDrawer],
   );
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

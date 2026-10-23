@@ -7,6 +7,7 @@ import { ToastProvider } from './context/ToastContext.jsx';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import Toasts from './components/Toasts.jsx';
+import CartDrawer from './components/CartDrawer.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import RouteFallback from './components/RouteFallback.jsx';
 import Home from './pages/Home.jsx';
@@ -43,6 +44,7 @@ export default function App() {
             <a className="skip-link" href="#main">
               Skip to content
             </a>
+            <p className="announce">Free standard shipping on orders over $75</p>
             <Header />
             <main id="main" tabIndex={-1}>
               <ErrorBoundary resetKey={pathname}>
@@ -60,6 +62,7 @@ export default function App() {
               </ErrorBoundary>
             </main>
             <Footer />
+            <CartDrawer />
             <Toasts />
           </DesignProvider>
         </InventoryProvider>

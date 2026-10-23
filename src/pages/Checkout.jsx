@@ -2,10 +2,10 @@ import { useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useInventory } from '../context/InventoryContext.jsx';
-import { cartTotals, qtyInCart } from '../context/cartReducer.js';
+import { FREE_SHIPPING_MIN, cartTotals, qtyInCart } from '../context/cartReducer.js';
 import { money } from '../lib/format.js';
 import { isStoredOrders, KEYS, readJSON, writeJSON } from '../lib/storage.js';
-import { LineThumb, lineDetails } from './Cart.jsx';
+import { LineThumb, lineDetails } from '../components/CartLine.jsx';
 import { CheckIcon } from '../components/Icons.jsx';
 import NotFound from './NotFound.jsx';
 
@@ -331,7 +331,7 @@ export default function Checkout() {
             <legend>Delivery</legend>
             <div className="radio-cards">
               {[
-                { v: 'standard', label: 'Standard', note: deliveryWindow('standard'), price: totals.subtotal >= 75 ? 'Free' : money(5.95) },
+                { v: 'standard', label: 'Standard', note: deliveryWindow('standard'), price: totals.subtotal >= FREE_SHIPPING_MIN ? 'Free' : money(5.95) },
                 { v: 'express', label: 'Express', note: deliveryWindow('express'), price: money(14.95) },
               ].map((o) => (
                 <label key={o.v} className="radio-card">

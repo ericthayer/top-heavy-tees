@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import Logo from './Logo.jsx';
 import { CartIcon, CloseIcon, MenuIcon } from './Icons.jsx';
 import { useCart } from '../context/CartContext.jsx';
 
 export default function Header() {
-  const { totals } = useCart();
+  const { totals, openDrawer } = useCart();
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
 
@@ -24,7 +24,13 @@ export default function Header() {
           </NavLink>
         </nav>
         <div className="site-header__actions">
-          <Link to="/cart" className="cart-link" aria-label={`Cart, ${totals.count} ${totals.count === 1 ? 'item' : 'items'}`}>
+          <button
+            type="button"
+            className="cart-link"
+            onClick={openDrawer}
+            aria-haspopup="dialog"
+            aria-label={`Cart, ${totals.count} ${totals.count === 1 ? 'item' : 'items'}`}
+          >
             <CartIcon size={22} />
             <span className="cart-link__label">Cart</span>
             {totals.count > 0 && (
@@ -32,7 +38,7 @@ export default function Header() {
                 {totals.count}
               </span>
             )}
-          </Link>
+          </button>
           <button
             type="button"
             className="menu-toggle"

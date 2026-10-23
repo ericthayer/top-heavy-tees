@@ -1,29 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
-import ShirtImage from '../components/ShirtImage.jsx';
+import { LineThumb, lineDetails } from '../components/CartLine.jsx';
+import FreeShippingMeter from '../components/FreeShippingMeter.jsx';
 import QtyStepper from '../components/QtyStepper.jsx';
 import { TrashIcon } from '../components/Icons.jsx';
-import { COLORS } from '../data/products.js';
 import { money } from '../lib/format.js';
 import { useCart } from '../context/CartContext.jsx';
 import { useInventory } from '../context/InventoryContext.jsx';
 import { qtyInCart } from '../context/cartReducer.js';
-
-export function LineThumb({ item }) {
-  return item.custom?.preview ? (
-    <img src={item.custom.preview} alt={`Your custom ${item.name}`} className="line-thumb" />
-  ) : (
-    <ShirtImage style={item.style} color={COLORS[item.colorId]?.hex ?? '#fff'} alt={`${item.name} in ${item.colorName}`} className="line-thumb" />
-  );
-}
-
-export function lineDetails(item) {
-  const parts = [item.colorName, `Size ${item.size}`];
-  if (item.custom) {
-    const sides = item.custom.sides.map((s) => (s === 'front' ? 'front' : 'back')).join(' and ');
-    parts.push(`Printed on the ${sides}`);
-  } else parts.push('Blank');
-  return parts;
-}
 
 export default function Cart() {
   const { items, totals, setQty, remove } = useCart();
@@ -48,7 +31,6 @@ export default function Cart() {
   }
 
   const problems = items.filter((i) => qtyInCart(items, i.productId, i.size) > stockOf(i.productId, i.size));
-  const toFree = 75 - totals.subtotal;
 
   return (
     <div className="cart-page">
@@ -118,9 +100,7 @@ export default function Cart() {
               <dd>{money(totals.total)}</dd>
             </div>
           </dl>
-          <p className="summary__note">
-            {toFree > 0 ? `Add ${money(toFree)} more for free standard shipping.` : 'Your order ships free.'}
-          </p>
+          <FreeShippingMeter subtotal={totals.subtotal} />
           <button type="button" className="btn btn--primary btn--lg btn--block" disabled={problems.length > 0} onClick={() => navigate('/checkout')}>
             Go to checkout
           </button>

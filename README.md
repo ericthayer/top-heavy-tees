@@ -47,6 +47,18 @@ npm run build
     sitting too low, accidental tilt, too wide for small sizes
   - file format and size
 
+## Storefront polish
+
+- **Product shots** (`lib/productShots.js`, `components/ProductShot.jsx`): every
+  product image is rendered in the browser by the mockup engine (fabric texture,
+  studio light, floor shadow), queued one at a time and cached. The vector
+  drawing shows instantly and the render fades in over it.
+- **Catalog cards** show the back of the shirt on hover.
+- **Product pages** have a front, back, angled and flat-lay gallery, shipping
+  promises and collapsible details.
+- **Cart drawer** (`components/CartDrawer.jsx`) slides in after "Add to cart"
+  and from the header, with a free-shipping meter.
+
 ## Data and state
 
 - Brand: the "TH" mark lives in `src/components/Logo.jsx` (`LogoMark`, `Wordmark`)
