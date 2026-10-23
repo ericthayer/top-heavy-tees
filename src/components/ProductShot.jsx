@@ -1,6 +1,10 @@
 import { memo, useEffect, useState } from 'react';
 import ShirtImage from './ShirtImage.jsx';
-import { peekShot, productShot, shotKey } from '../lib/productShots.js';
+
+// The renderer pulls in the mockup engine, so it loads on demand: the vector
+// drawing below covers the moment before it arrives.
+let renderer = null;
+const loadRenderer = () => import('../lib/productShots.js').then((m) => (renderer = m));
 
 /**
  * A rendered "studio photo" of a shirt. The vector drawing shows immediately
@@ -8,14 +12,17 @@ import { peekShot, productShot, shotKey } from '../lib/productShots.js';
  */
 function ProductShot({ style, color, side = 'front', view = 'studio', width = 720, design = null, fallbackDesign = null, alt, className = '' }) {
   const opts = { style, color, side, view, width, design };
-  const key = shotKey(opts);
-  const [url, setUrl] = useState(() => peekShot(opts));
+  const key = [style, color, side, view, width, design?.key ?? ''].join('|');
+  const [url, setUrl] = useState(() => renderer?.peekShot(opts) ?? null);
 
   useEffect(() => {
     let alive = true;
-    const cached = peekShot(opts);
-    setUrl(cached);
-    if (!cached) productShot(opts).then((u) => alive && setUrl(u), () => {});
+    loadRenderer().then((r) => {
+      if (!alive) return;
+      const cached = r.peekShot(opts);
+      setUrl(cached);
+      if (!cached) r.productShot(opts).then((u) => alive && setUrl(u), () => {});
+    });
     return () => {
       alive = false;
     };

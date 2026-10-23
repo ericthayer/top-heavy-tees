@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductShot from '../components/ProductShot.jsx';
-import { productShot } from '../lib/productShots.js';
 import ProductCard from '../components/ProductCard.jsx';
 import { SuggestionCard } from '../components/studio/SuggestionCard.jsx';
 import { COLORS, PRODUCTS } from '../data/products.js';
@@ -71,7 +70,9 @@ export default function Home() {
   // Once the page has settled, render the other hero colors so switching is instant.
   useEffect(() => {
     const t = setTimeout(() => {
-      HERO_COLORS.forEach((id) => productShot({ style: 'crew', color: COLORS[id].hex, width: 960, design: SUNRISE_PLACED }));
+      import('../lib/productShots.js').then(({ productShot }) =>
+        HERO_COLORS.forEach((id) => productShot({ style: 'crew', color: COLORS[id].hex, width: 960, design: SUNRISE_PLACED })),
+      );
     }, 1500);
     return () => clearTimeout(t);
   }, []);
