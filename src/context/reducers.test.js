@@ -58,4 +58,17 @@ describe('designReducer', () => {
     expect(restored.designs.back.previous).toBeNull();
     expect(restored.designs.front).toBeNull();
   });
+
+  it('falls back to defaults when a saved session no longer matches the catalog', () => {
+    expect(fromStored({ productId: 'retired-shirt', colorId: 'white' })).toBe(initialDesign);
+    const restored = fromStored({ productId: 'everyday-crew', colorId: 'chartreuse', qty: -3, side: 'top' });
+    expect(restored.colorId).not.toBe('chartreuse');
+    expect(restored.qty).toBe(initialDesign.qty);
+    expect(restored.side).toBe('front');
+  });
+
+  it('ignores saved artwork that is not an inline image', () => {
+    const restored = fromStored({ ...initialDesign, designs: { front: { storageSrc: 'https://evil.example/x.png' }, back: null } });
+    expect(restored.designs.front).toBeNull();
+  });
 });

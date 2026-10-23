@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ProductShot from '../components/ProductShot.jsx';
 import { productShot } from '../lib/productShots.js';
 import ProductCard from '../components/ProductCard.jsx';
-import { SuggestionCard } from '../components/studio/SuggestionsPanel.jsx';
+import { SuggestionCard } from '../components/studio/SuggestionCard.jsx';
 import { COLORS, PRODUCTS } from '../data/products.js';
 import { getPrintArea } from '../lib/shirtSvg.js';
 import { SUNRISE_DATA_URL, SUNRISE_RASTER_URL } from '../lib/samples.js';

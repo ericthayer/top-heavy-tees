@@ -1,0 +1,26 @@
+name: Release
+
+# Reads conventional commits on main and keeps a release PR open that bumps
+# package.json and CHANGELOG.md. Merging that PR tags vX.Y.Z and publishes a
+# GitHub release.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

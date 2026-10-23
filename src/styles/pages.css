@@ -1214,3 +1214,11 @@ img.line-thumb[src^='data:image/jpeg'] {
   font-size: var(--fs-18);
   margin-bottom: 8px;
 }
+
+/* Route loading ------------------------------------------------------------------- */
+
+.route-loading {
+  display: grid;
+  place-items: center;
+  min-height: 60vh;
+}

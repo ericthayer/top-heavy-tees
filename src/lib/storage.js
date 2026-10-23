@@ -1,9 +1,12 @@
 // localStorage can be unavailable (private mode) or full; never let that break the app.
 
-export function readJSON(key, fallback) {
+/** `isValid` guards against stale or hand-edited data from an older build. */
+export function readJSON(key, fallback, isValid = () => true) {
   try {
     const raw = window.localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
+    if (!raw) return fallback;
+    const value = JSON.parse(raw);
+    return isValid(value) ? value : fallback;
   } catch {
     return fallback;
   }
@@ -25,3 +28,16 @@ export const KEYS = {
   inventory: 'topheavy.inventory.v1',
   orders: 'topheavy.orders.v1',
 };
+
+const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const isCount = (n) => Number.isInteger(n) && n > 0;
+
+export const isStoredCart = (v) =>
+  isObject(v) &&
+  Array.isArray(v.items) &&
+  v.items.every((i) => isObject(i) && typeof i.key === 'string' && isCount(i.qty) && Number.isFinite(i.unitPrice));
+
+export const isStoredInventory = (v) =>
+  isObject(v) && Object.values(v).every((sizes) => isObject(sizes) && Object.values(sizes).every(Number.isInteger));
+
+export const isStoredOrders = (v) => Array.isArray(v) && v.every((o) => isObject(o) && typeof o.id === 'string');
