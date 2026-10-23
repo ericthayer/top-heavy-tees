@@ -101,6 +101,19 @@ export const RulerIcon = make(
     <path d="M6 8v3M9.5 8v4M13 8v3M16.5 8v4" />
   </>,
 );
+export const TruckIcon = make(
+  <>
+    <path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" />
+    <circle cx="7" cy="18" r="1.8" />
+    <circle cx="17" cy="18" r="1.8" />
+  </>,
+);
+export const ClockIcon = make(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </>,
+);
 export const ArrowLeftIcon = make(<path d="M19 12H5M11 6l-6 6 6 6" />);
 export const SparkIcon = make(
   <path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z" />,

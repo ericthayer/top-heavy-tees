@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import ShirtImage from '../components/ShirtImage.jsx';
+import ProductShot from '../components/ProductShot.jsx';
+import { ClockIcon, TruckIcon } from '../components/Icons.jsx';
 import Swatches from '../components/Swatches.jsx';
 import SizePicker from '../components/SizePicker.jsx';
 import QtyStepper from '../components/QtyStepper.jsx';
@@ -13,21 +14,26 @@ import { money } from '../lib/format.js';
 import { useCart } from '../context/CartContext.jsx';
 import { useInventory } from '../context/InventoryContext.jsx';
 import { useDesign } from '../context/DesignContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
+
+const VIEWS = [
+  { id: 'front', label: 'Front', side: 'front', view: 'studio' },
+  { id: 'back', label: 'Back', side: 'back', view: 'studio' },
+  { id: 'angled', label: 'Angled', side: 'front', view: 'angled' },
+  { id: 'flatlay', label: 'Flat lay', side: 'front', view: 'flatlay' },
+];
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [params] = useSearchParams();
   const product = getProduct(id);
   const navigate = useNavigate();
-  const { add } = useCart();
+  const { add, openDrawer } = useCart();
   const { availableOf, totalOf } = useInventory();
   const { dispatch } = useDesign();
-  const { notify } = useToast();
 
   const initialColor = product?.colors.includes(params.get('color')) ? params.get('color') : product?.colors[0];
   const [colorId, setColorId] = useState(initialColor);
-  const [side, setSide] = useState('front');
+  const [viewId, setViewId] = useState('front');
   const [size, setSize] = useState(null);
   const [qty, setQty] = useState(1);
 
@@ -36,7 +42,7 @@ export default function ProductDetail() {
     setColorId(product.colors.includes(params.get('color')) ? params.get('color') : product.colors[0]);
     setSize(['M', 'L', 'S', 'XL', 'XXL'].find((s) => availableOf(product.id, s) > 0) ?? null);
     setQty(1);
-    setSide('front');
+    setViewId('front');
     // Reset only when navigating to a different product.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id]);
@@ -44,6 +50,7 @@ export default function ProductDetail() {
   if (!product) return <NotFound title="We couldn’t find that shirt" text="It may have been renamed or removed from the catalog." />;
 
   const color = COLORS[colorId];
+  const view = VIEWS.find((v) => v.id === viewId) ?? VIEWS[0];
   const out = totalOf(product.id) === 0;
   const available = size ? availableOf(product.id, size) : 0;
   const area = getPrintArea(product.style, 'front');
@@ -61,10 +68,7 @@ export default function ProductDetail() {
       unitPrice: unitPrice(product, size),
       custom: null,
     });
-    notify(`Added ${qty > 1 ? `${qty} × ` : ''}${product.name} (${color.name}, ${size}) to the cart.`, {
-      tone: 'success',
-      action: { to: '/cart', label: 'View cart' },
-    });
+    openDrawer();
     setQty(1);
   };
 
@@ -85,14 +89,21 @@ export default function ProductDetail() {
       <div className="pdp__grid">
         <div className="pdp__gallery">
           <div className="pdp__stage">
-            <ShirtImage style={product.style} color={color.hex} side={side} loading="eager" alt={`${product.name} in ${color.name}, ${side} view`} />
+            <ProductShot
+              style={product.style}
+              color={color.hex}
+              side={view.side}
+              view={view.view}
+              width={1200}
+              alt={`${product.name} in ${color.name}, ${view.label.toLowerCase()} view`}
+            />
             {out && <span className="badge badge--out badge--lg">Out of stock</span>}
           </div>
-          <div className="pdp__views" role="group" aria-label="View">
-            {['front', 'back'].map((s) => (
-              <button key={s} type="button" className="pdp__view" aria-pressed={side === s} onClick={() => setSide(s)}>
-                <ShirtImage style={product.style} color={color.hex} side={s} alt="" />
-                <span>{s === 'front' ? 'Front' : 'Back'}</span>
+          <div className="pdp__views" role="group" aria-label="Views">
+            {VIEWS.map((v) => (
+              <button key={v.id} type="button" className="pdp__view" aria-pressed={viewId === v.id} onClick={() => setViewId(v.id)}>
+                <ProductShot style={product.style} color={color.hex} side={v.side} view={v.view} width={240} alt="" />
+                <span>{v.label}</span>
               </button>
             ))}
           </div>
@@ -136,30 +147,60 @@ export default function ProductDetail() {
           </button>
           <p className="pdp__hint">Opens the design studio with {color.name.toLowerCase()} selected.</p>
 
-          <dl className="spec-list">
-            <div>
-              <dt>Fabric</dt>
-              <dd>{product.fabric}</dd>
-            </div>
-            <div>
-              <dt>Fit</dt>
-              <dd>{product.fit[0].toUpperCase() + product.fit.slice(1)}</dd>
-            </div>
-            <div>
-              <dt>Print area</dt>
-              <dd>
-                {area.inchesW} × {area.inchesH} in, front and back
-              </dd>
-            </div>
-            <div>
-              <dt>Sizes</dt>
-              <dd>{SIZES.join(', ')} (XXL +$2)</dd>
-            </div>
-            <div>
-              <dt>Care</dt>
-              <dd>Machine wash cold, inside out. Tumble dry low.</dd>
-            </div>
-          </dl>
+          <ul className="promises">
+            <li>
+              <TruckIcon size={20} />
+              Free standard shipping over $75
+            </li>
+            <li>
+              <ClockIcon size={20} />
+              Printed within two business days
+            </li>
+          </ul>
+
+          <div className="accordion">
+            <details open>
+              <summary>Details</summary>
+              <dl className="spec-list">
+                <div>
+                  <dt>Fabric</dt>
+                  <dd>{product.fabric}</dd>
+                </div>
+                <div>
+                  <dt>Fit</dt>
+                  <dd>{product.fit[0].toUpperCase() + product.fit.slice(1)}</dd>
+                </div>
+                <div>
+                  <dt>Print area</dt>
+                  <dd>
+                    {area.inchesW} × {area.inchesH} in, front and back
+                  </dd>
+                </div>
+                <div>
+                  <dt>Sizes</dt>
+                  <dd>{SIZES.join(', ')} (XXL +$2)</dd>
+                </div>
+                <div>
+                  <dt>Care</dt>
+                  <dd>Machine wash cold, inside out. Tumble dry low.</dd>
+                </div>
+              </dl>
+            </details>
+            <details>
+              <summary>Printing</summary>
+              <p>
+                Your artwork is printed directly into the fabric, so any number of colors costs the same. Each side holds a design up to{' '}
+                {area.inchesW} × {area.inchesH} in. On dark shirts we lay down a white base first so colors stay bright.
+              </p>
+            </details>
+            <details>
+              <summary>Shipping</summary>
+              <p>
+                Every shirt is printed to order within two business days. Standard shipping arrives 5–7 business days after you order and is free
+                over $75. Express arrives in 3–4.
+              </p>
+            </details>
+          </div>
         </div>
       </div>
 

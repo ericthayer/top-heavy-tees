@@ -24,7 +24,7 @@ const SIDES = ['front', 'back'];
 
 export default function DesignStudio() {
   const { state, dispatch } = useDesign();
-  const { add } = useCart();
+  const { add, openDrawer } = useCart();
   const { availableOf, totalOf } = useInventory();
   const { notify } = useToast();
   const [params, setParams] = useSearchParams();
@@ -192,10 +192,7 @@ export default function DesignStudio() {
         unitPrice: unitPrice(product, state.size, sides),
         custom: { id: `c_${Date.now().toString(36)}`, sides, preview, files: sides.map((s) => state.designs[s].name) },
       });
-      notify(`Added ${state.qty > 1 ? `${state.qty} custom shirts` : 'your custom shirt'} to the cart.`, {
-        tone: 'success',
-        action: { to: '/cart', label: 'View cart' },
-      });
+      openDrawer();
       dispatch({ type: 'setQty', qty: 1 });
     } finally {
       setAdding(false);
