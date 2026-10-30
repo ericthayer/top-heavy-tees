@@ -59,6 +59,15 @@ npm run build
 - **Cart drawer** (`components/CartDrawer.jsx`) slides in after "Add to cart"
   and from the header, with a free-shipping meter.
 
+## Performance budget
+
+First-load JavaScript (the entry script plus its preloads, gzipped) must stay at
+or under **100 KiB**. `npm run size` checks it after a build, and CI runs it on
+every PR. About 79 KiB of the budget is React and the router. Route chunks that
+load on navigation are not counted, so new features should load lazily
+(dynamic `import()`). Raising the budget is a one-line change to `BUDGET_KIB` in
+`scripts/check-bundle-size.mjs`, and should be a deliberate choice.
+
 ## Data and state
 
 - Brand: the "TH" mark lives in `src/components/Logo.jsx` (`LogoMark`, `Wordmark`)
