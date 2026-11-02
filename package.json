@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "size": "node scripts/check-bundle-size.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",
